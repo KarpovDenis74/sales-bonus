@@ -54,6 +54,7 @@ function analyzeSalesData(data, options) {
         || !Array.isArray(data.sellers) 
         || data.sellers.length === 0
         || !Array.isArray(data.purchase_records) 
+        || data.purchase_records.length === 0
         || !Array.isArray(data.products)
         || !options || !options.calculateRevenue 
         || !options.calculateBonus) {
