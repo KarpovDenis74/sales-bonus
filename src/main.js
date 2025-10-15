@@ -121,19 +121,6 @@ function analyzeSalesData(data, options) {
 
     });
 
-    const a = sellerStats.map(seller => ({
-        seller_id: seller.id, // Строка, идентификатор продавца
-        name: seller.name, // Строка, имя продавца
-        revenue: seller.revenue, // Число с двумя знаками после точки, выручка продавца
-        profit: seller.profit, // Число с двумя знаками после точки, прибыль продавца
-        sales_count: seller.sales_count, // Целое число, количество продаж продавца
-        top_products: seller.top_products, // Массив объектов вида: { "sku": "SKU_008","quantity": 10}, топ-10 товаров продавца
-        bonus: seller.bonus, // Число с двумя знаками после точки, бонус продавца
-    })); 
-
-    a.forEach(seller => {
-        console.log('seller', seller);
-    });
     // @TODO: Подготовка итоговой коллекции с нужными полями
     return sellerStats.map(seller => ({
         seller_id: seller.id, // Строка, идентификатор продавца
