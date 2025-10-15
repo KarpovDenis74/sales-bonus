@@ -7,14 +7,15 @@
 function calculateSimpleRevenue(purchase, _product) {
    // @TODO: Расчет выручки от операции
 
-   if (!purchase.discount || !purchase.quantity || !purchase.sale_price
+   if (!purchase || purchase.discount === undefined || purchase.quantity === undefined || purchase.sale_price === undefined
 
    ) {
        return 0;
    }
-   const discount = 1 - (Number(purchase.discount) / 100);
-   const revenue = Number(purchase.sale_price) * Number(purchase.quantity) * discount;
-   return parseFloat((Math.round(revenue * 100) / 100).toFixed(2));
+   const discount = 1 - (purchase.discount / 100);
+   const revenue = purchase.sale_price * purchase.quantity * discount;
+   return revenue;
+//    return parseFloat((Math.round(revenue * 100) / 100).toFixed(2));
 }
 
 /**
@@ -129,6 +130,7 @@ function analyzeSalesData(data, options) {
             .map(([sku, quantity]) => ({sku, quantity}))
             .sort((a, b) => b.quantity - a.quantity)
             .slice(0, 10)); // Формируем топ-10 товаров
+
     });
 
     // @TODO: Подготовка итоговой коллекции с нужными полями
