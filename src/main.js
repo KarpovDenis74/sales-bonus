@@ -72,19 +72,6 @@ function analyzeSalesData(data, options) {
     }
 
     // @TODO: Подготовка промежуточных данных для сбора статистики
-    const customers = new Map();
-    const sellers = new Map();
-    const products = new Map();
-
-    for (let customer of data.customers) {
-        customers.set(customer.id, customer);
-    }
-    for (let seller of data.sellers) {
-        sellers.set(seller.id, seller);
-    }
-    for (let product of data.products) {
-        products.set(product.sku, product);
-    }
     let sellerStats = data.sellers.map(seller => {
         return {
             id: seller.id,
@@ -109,9 +96,9 @@ function analyzeSalesData(data, options) {
         seller.revenue += purchase.total_amount;
         purchase.items.forEach(item => {
             const product = productsIndex[item.sku];
-            const cost = Number(Number(product.purchase_price) *  Number(item.quantity)).toFixed(2);
+            const cost = Number(product.purchase_price) *  Number(item.quantity);
             const revenue = options.calculateRevenue(item, product);
-            seller.profit += Number(revenue).toFixed(2) - Number(cost).toFixed(2); //revenue - cost;
+            seller.profit += Number(revenue) - Number(cost); //revenue - cost;
             if (!seller.products_sold[item.sku]) {
                 seller.products_sold[item.sku] = 0;
             }
@@ -126,16 +113,15 @@ function analyzeSalesData(data, options) {
     // @TODO: Назначение премий на основе ранжирования
     sellerStats.forEach((seller, index) => {
         seller.bonus = options.calculateBonus(index, sellerStats.length, seller); // Считаем бонус
-        seller.top_products = (
+        seller.top_products = 
             Object.entries(seller.products_sold)
             .map(([sku, quantity]) => ({sku, quantity}))
             .sort((a, b) => b.quantity - a.quantity)
-            .slice(0, 10)); // Формируем топ-10 товаров
+            .slice(0, 10); // Формируем топ-10 товаров
 
     });
 
-    // @TODO: Подготовка итоговой коллекции с нужными полями
-    return sellerStats.map(seller => ({
+    const a = sellerStats.map(seller => ({
         seller_id: seller.id, // Строка, идентификатор продавца
         name: seller.name, // Строка, имя продавца
         revenue: seller.revenue, // Число с двумя знаками после точки, выручка продавца
@@ -143,6 +129,20 @@ function analyzeSalesData(data, options) {
         sales_count: seller.sales_count, // Целое число, количество продаж продавца
         top_products: seller.top_products, // Массив объектов вида: { "sku": "SKU_008","quantity": 10}, топ-10 товаров продавца
         bonus: seller.bonus, // Число с двумя знаками после точки, бонус продавца
+    })); 
+
+    a.forEach(seller => {
+        console.log('seller', seller);
+    });
+    // @TODO: Подготовка итоговой коллекции с нужными полями
+    return sellerStats.map(seller => ({
+        seller_id: seller.id, // Строка, идентификатор продавца
+        name: seller.name, // Строка, имя продавца
+        revenue: parseFloat(Number(seller.revenue).toFixed(2)), //seller.revenue, // Число с двумя знаками после точки, выручка продавца
+        profit: parseFloat(Number(seller.profit).toFixed(2)), // Число с двумя знаками после точки, прибыль продавца
+        sales_count: seller.sales_count, // Целое число, количество продаж продавца
+        top_products: seller.top_products, // Массив объектов вида: { "sku": "SKU_008","quantity": 10}, топ-10 товаров продавца
+        bonus: parseFloat(Number(seller.bonus).toFixed(2)), // Число с двумя знаками после точки, бонус продавца
 })); 
 }
 
